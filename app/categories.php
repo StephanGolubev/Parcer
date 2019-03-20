@@ -12,9 +12,9 @@
 <?php
 require_once 'classes/db.php';
 require_once 'classes/getter.php';
-require_once 'model/categories.php';
+// require_once 'model/categories.php';
 // require_once 'core/view.php';
-$cate = new Categore();
+
 
 
 $object = new Getter();
@@ -53,7 +53,9 @@ echo "</ul>";
 $name = array('name');
 echo $test =  $con->insert('categories',$name,$array);
 
-
+// $cate = new Categore();
+// $cate->name = "hello";
+// $cate->Inserting();
     }
     
     

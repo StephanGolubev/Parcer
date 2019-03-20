@@ -1,6 +1,7 @@
 <?php
-require("../classes/db.php");
-require '../classes/getter.php';
+// include "../classes/db.php";
+// include('../classes/categories.php');
+// require '../classes/getter.php';
 
 
 class Categore extends DB{
@@ -9,4 +10,8 @@ class Categore extends DB{
     public $url;
 
 
+    public function Inserting($conn){ 
+    }
+
 }
+?>
