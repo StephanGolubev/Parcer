@@ -12,8 +12,9 @@
 <?php
 require_once 'classes/db.php';
 require_once 'classes/getter.php';
+require_once 'model/categories.php';
 // require_once 'core/view.php';
-
+$cate = new Categore();
 
 
 $object = new Getter();
