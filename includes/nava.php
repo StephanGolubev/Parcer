@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Parcer</title>
@@ -15,13 +15,13 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href=".php">Home<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="../index.php">Home<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="app/categories.php">Scan site categories</a>
+          <a class="nav-link" href="categories.php">Scan site categories</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="app/catalog.php">Scan site catalog</a>
+          <a class="nav-link" href="catalog.php">Scan site catalog</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Scan site cards</a>
@@ -41,7 +41,3 @@
     </div>
   </nav>
 </header>
-<body>
- 
-</body>
-</html>

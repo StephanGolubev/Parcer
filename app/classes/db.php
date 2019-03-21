@@ -33,8 +33,8 @@ class DB {
 		$this->_result = false;
 		if ($this->_link) {
 			$this->_result = mysqli_query($this->_link,$query);
-			// return $this->_result;
-			return "<h3>Все сканированно и добавлено в базу данных</h3>";
+			return $this->_result;
+			// return "<h3>Все сканированно и добавлено в базу данных</h3>";
 		}
 		return "no link";
 	}
@@ -97,4 +97,15 @@ class DB {
 		return false;
 	}
 	
+
+	public function BuildSelect($table){
+		$query =  "SELECT * FROM ".$table;
+		return $this->query($query);
+		// return $query;
+	}
+
+	public function	numRows() {
+		if ($this->_link AND $this->_result)
+			return mysqli_num_rows($this->_result);
+	}
 }

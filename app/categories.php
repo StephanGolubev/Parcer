@@ -8,7 +8,7 @@
     <script src="main.js"></script>
 </head>
 <body>
-
+<?php require "../includes/nava.php" ?>
 <?php
 require_once 'classes/db.php';
 require_once 'classes/getter.php';
