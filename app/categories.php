@@ -19,15 +19,20 @@ require_once 'classes/getter.php';
 
 $object = new Getter();
 $con = new DB();
+
+
 $object->url = "дизайн-керамика.рф";
 $result = $object->get_web_page();
+
 if (($result['errno'] != 0 )||($result['http_code'] != 200))
     {
 	echo $result['errmsg'];
 	}
-else
-	{
-    $page = $result['content'];
+else{
+
+
+
+
     $page2 = $result['content'];
     $pos = strpos($page2, "<svg role=\"img\" class=\"arrow\"><use xlink:href=\"/static/images/sprite.svg#arrow\"></use></svg>");
     $page2 = substr($page2, $pos);
@@ -36,27 +41,26 @@ else
     $array = array();
 
 echo "<ul>";
-    $dom = new domdocument();
-    libxml_use_internal_errors(true);
-    $dom->loadhtml('<?xml encoding="utf-8" ?>' . $page2);
-    $links = $dom->getelementsbytagname('a');
-    foreach($links as $link) {
-        array_push($array,$link->nodeValue);
-        echo "<li>".$link->nodeValue . PHP_EOL."</li>";
-        echo "<br>";
 
+    $name = array('name', 'url');
+    $regex = "<a href=\"([^\"]*)\">(.*)<\/a>";
 
+    if(preg_match_all("/$regex/iU", $page2, $matches)) {
+      }
+      $matches_link = $matches[1];
+      $matches_name = $matches[2];
+
+      for ($i=0; $i < count($matches_link); $i++) { 
+        array_push($array,$matches_name[$i]);
+        array_push($array,$matches_link[$i]);
+          echo $matches_link[$i]."->  ";
+          echo $matches_name[$i]."<br>";
+        // $test =  $con->insert('categories',$name,$array);
+       $array = array();
+      }
 
 }
 echo "</ul>";
-
-$name = array('name');
-echo $test =  $con->insert('categories',$name,$array);
-
-// $cate = new Categore();
-// $cate->name = "hello";
-// $cate->Inserting();
-    }
     
     
       ?>  

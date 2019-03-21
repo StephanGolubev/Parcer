@@ -29,14 +29,6 @@ class DB {
 		// mysqli_query('SET CHARACTER SET utf8', $this->_link);
 	}
 	
-	/*
-	public function	disconnect() {
-		if ($this->_link)
-			mysql_close($this->_link);
-		$this->_link = false;
-	}
-	*/
-	
 	public function query($query) {
 		$this->_result = false;
 		if ($this->_link) {
@@ -60,17 +52,21 @@ class DB {
 		}
 		return false;
 	}
+
+
 	
 	public function insert($table,$name, $values) {
-		$query = "INSERT INTO "."`".$table."`"." (`";
+		$query = "INSERT INTO "."`".$table."`"." (";
 		foreach ((array) $name AS $key => $value)
-			$query .= "".$value."`, ";
+			$query .= "`".$value."`, ";
 		// foreach ($values AS $key => $value)
 		// 	$query .= $key.', ';
-		$query = rtrim($query, " ,")."".") VALUES ";
+		$query = rtrim($query, " ,")."".") VALUES (";
 		foreach ($values AS $key => $value)
-			$query .= "('".$value."') , ";
-		$query = rtrim($query, ", ");
+			$query .= "'".$value."' , ";
+		$query = rtrim($query, " ,");
+		$query .= ")";
+		
 		return $this->query($query);
 		// return $query;
 		// return mysqli_query($this->_link,$query);
@@ -92,8 +88,6 @@ class DB {
 		return $this->query($query);
 	}
 	
-	//INSERT INTO tbl_name (col1,col2) VALUES (col2*2,15);
-	//UPDATE persondata SET age=age*2, age=age+1;
 	
 	
 	public function delete($table, $where = false, $limit = false) {
