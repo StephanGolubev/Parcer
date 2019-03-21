@@ -1,5 +1,6 @@
 <?php require "../includes/nava.php" ?>
 <?php
+ini_set('max_execution_time', 300);
 
 require_once 'classes/db.php';
 require_once 'classes/getter.php';
@@ -25,12 +26,32 @@ echo "</table>";
     // echo htmlspecialchars($page);
     if (($result['errno'] != 0 )||($result['http_code'] != 200)){
         echo "No";
-	    echo $result['errmsg'];
+        echo $result['errmsg'];
 	}else{
 
     $page2 = $result['content'];
-    echo $page2;
-    echo "good";
+
+    $pos = strpos($page2, "<!-- Catalog content -->");
+    $page2 = substr($page2, $pos);
+    $pos = strpos($page2, "<!-- /Catalog content -->");
+    $page2 = substr($page2, 0, $pos);
+
+
+        echo $page2;
     echo "<br><br><br>";
+
+
+
+    $name = array('name', 'url');
+    $regex = "(?<=href=\").+(?=\")";
+    // <a href="/plitka/">Керамическая плитка</a>
+    // <a class="collection_cart" href="/plitka/collKarandashiKerama-Marazzi/">
+
+    if(preg_match_all("/$regex/iU", $page2, $matches)) {
+        print_r($matches[0]);
+        // echo $matches[2];
+      }
+      echo "<br><br><br>";
 }
 }
+print_r($matches);
