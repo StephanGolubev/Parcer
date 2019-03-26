@@ -11,12 +11,11 @@ class Getter {
       
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);   // возвращает веб-страницу
         curl_setopt($ch, CURLOPT_HEADER, 0);           // не возвращает заголовки
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);   // переходит по редиректам
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);   // переходит по редиректам
         curl_setopt($ch, CURLOPT_ENCODING, "");    
         curl_setopt($ch, CURLOPT_USERAGENT, "booyah!");    // обрабатывает все кодировки
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0); // таймаут соединения
         curl_setopt($ch, CURLOPT_TIMEOUT, 0);        // таймаут ответа
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);       // останавливаться после 10-ого редиректа
       
         $content = curl_exec( $ch );
         $err     = curl_errno( $ch );
