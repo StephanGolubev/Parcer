@@ -5,6 +5,25 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <style>
     #loading{position:fixed;top:40%;left:40%;z-index:1104;}
+    #myBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  z-index: 99;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
     </style>
 </head>
 <body>
@@ -12,14 +31,30 @@
 $( document ).ready(function() {
     $("#loading").hide();
 });
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("myBtn").style.display = "block";
+  } else {
+    document.getElementById("myBtn").style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
 </script>
 <!-- <img id="loading" alt="" src="../media/loader.gif"/> -->
+<button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>   
 
 
 <?php require "../includes/nava.php" ?>
 <?php
 ini_set('max_execution_time', 600);
-error_reporting(0);
+// error_reporting(0);
 
 require_once 'classes/db.php';
 require_once 'classes/getter.php';
@@ -93,7 +128,6 @@ echo "</table>";
         // htmlspecialchars($page_product);
         // echo $page_product;
         
-        $massiv = array();
         $reg_ex1 = "<(.|\n)*?>";
         $reg_ex2 = "<div[^<>]*class=\"[^\"']+\"[^<>]*>[\s\S]*?</div>";
         $reg_ex = "<div[^<>]*class=\"my-class\"[^<>]*>[\s\S]*?";
@@ -109,29 +143,51 @@ $dom->loadhtml('<?xml encoding="utf-8" ?>' . $page_product);
 $finder = new DomXPath($dom);
 $classname="product__info__group";
 $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-print_r($nodes);
-echo $nodes->textContent;
-foreach ($nodes as $value10) {
-    echo $value10->textContent."<br>";
+// print_r($nodes);
+// echo $nodes->textContent;
+$insert_vals = array();
+$tables = array('coutry', 'creator', 'name', 'category');
+$counter = 0;
+foreach ($nodes as $value_card) {
+    if (preg_match('/(Код товара)/', $value_card->textContent)) {
+        echo "<li>No<br>";
+        continue;
+     }
+     $value_card->textContent = trim(preg_replace('/\s\s+/', ' ', $value_card->textContent));
+    echo "<li>".$value_card->textContent."<br>";
+        
+    // $insert_vals[$counter] = $$value_card->textContent;
+    // $counter = $counter + 1;
+    // array_push($insert_vals,$value_card->textContent);
+    array_splice($insert_vals, $counter, 0, $value_card->textContent);
+   
+
 }
-
-        // (?<=href=\").+(?=\")
-        // class="product__info__name">
-
-        // str_replace("'", "\"", $page_product);
         preg_match_all('~the_title">\K(?:[^<]+)(?=<)~', $page_product, $matches10);
-        print_r($matches10);
+        foreach ($matches10[0] as $key => $value_name) {
+            echo "<li>".$value_name."<br>";
+            array_push($insert_vals,$value_name);
+        }
+        array_push($insert_vals, $row['id']);
+        echo $nubers = count($insert_vals)."<br>";
+        if ($nubers == 2) {
+            $insert_vals_sp = array();
+            $insert_vals_sp[0] = 'None';
+            $insert_vals_sp[1] = 'None';
+            $insert_vals_sp[2] = $insert_vals[0];
+            $insert_vals_sp[3] = $insert_vals[1];
+            
+            
+            print_r($insert_vals_sp);
+            // $query =  $con->insert('card',$tables,$insert_vals_sp);
+            echo "<hr>";
+            continue;
+        }
+        print_r($insert_vals);
+        echo "<br>";
+        // $query =  $con->insert('card',$tables,$insert_vals);
         echo "<hr>";
-    // if(preg_match_all("/class=\"product__info__value\">[.*]</iU", $page_product, $mat)) {
-    //   }
-    //   foreach ($mat[0] as $value1) {
-        //   if ($value1 = 'Страна'or 'Производитель' or 'Код товара') {
-            //   array_push($massiv,$value1);
-            // echo "No<br>";
-        //   }
-        //   echo  "<li>".$value1."<br>";
-    //   }
-    //   print_r($massiv);
+
     }
 
 }
@@ -139,5 +195,6 @@ foreach ($nodes as $value10) {
       echo "<br><br><br>";
 }
 }?>
+
 </body>
 </html>

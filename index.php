@@ -4,6 +4,11 @@
 	<title>Parcer</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <style>
+  body{
+    text-alieng:center;
+  } 
+   </style>
 </head>
 <header>
   <!-- Fixed navbar -->
@@ -15,7 +20,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href=".php">Home<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="index.php">Home<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="app/categories.php">Scan site categories</a>
@@ -42,6 +47,22 @@
   </nav>
 </header>
 <body>
- 
-</body>
+ <?php 
+ require_once 'app/classes/db.php';
+ $con = new DB();
+ $res = $con->BuildSelect("categories");
+ while($row = mysqli_fetch_array($res)){
+  echo '<div class="col-sm-6">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">'.$row['name'].'</h5>
+      <a href="http://localhost/parcer/view/catalog.php?id='. $row['id'] .'" class="btn btn-primary">Go to see all cards</a>
+    </div>
+  </div>
+  </div>';
+}
+ ?>
+ <br><br>
+ <br></body>
 </html>
+

@@ -26,6 +26,9 @@ class DB {
         }
 		
 		$this->_link->set_charset("utf8");
+		$this->_link->query("set names 'UTF-8'");  
+		// $this->_link->character-set-server = utf8;
+		// $this->_link->collation-server = utf8_unicode_ci;
 		// mysqli_query('SET CHARACTER SET utf8', $this->_link);
 	}
 	
@@ -42,11 +45,11 @@ class DB {
 
 	public function getRows($query, $array = true) {
 		$this->_result = false;
-		if ($this->_link && $this->_result = mysql_query($query, $this->_link)) {
+		if ($this->_link && $this->_result = mysqli_query( $this->_link,$query)) {
 			if (!$array)
 				return $this->_result;
 			$resultArray = array();
-			while ($row = mysql_fetch_assoc($this->_result))
+			while ($row = mysqli_fetch_assoc($this->_result))
 				$resultArray[] = $row;
 			return $resultArray;
 		}
