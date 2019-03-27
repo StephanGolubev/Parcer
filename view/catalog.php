@@ -46,11 +46,14 @@
 <?php 
  require_once '../app/classes/db.php';
  $con = new DB();
- //  $res = $con->BuildSelect("card");
+
+//  получаем id из url
 $num = $_GET['id'];
- $sql = "SELECT * FROM card WHERE category='$num'";
+// получаем все товары с каталогам id
+$sql = "SELECT * FROM card WHERE category='$num'";
 $result = $con->getRows($sql);
-$count = 0;
+
+// бежим по массиву и выводи значения
 echo '<div class="row">';
 for ($i=0; $i < count($result); $i++) { 
     echo '<div class="col-sm-6">

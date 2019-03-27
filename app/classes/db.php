@@ -1,5 +1,6 @@
 <?php
 class DB {
+	// переменные для xampp бд
 	protected $_server = 'localhost';
 	protected $_user = 'root';
 	protected $_password = '';
@@ -9,29 +10,22 @@ class DB {
 	protected static $_db;
 	private static $_instance;
 	
-	/*
-	public function __destruct() {
-		$this->disconnect();
-	}
-	*/
-	
+	// функция подключения к бд
 	public function __construct() {
-        // $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
 		
 		if (!$this->_link = mysqli_connect($this->_server, $this->_user, $this->_password, $this->_database))
 			die('Невозможно подключится к БД как '.$this->_user.'@'.$this->_server.'. MySQL error: '.mysqli_error());
 		else {
+			// делаем для русского языка
 			$this->_link->set_charset("utf8");
 			$this->_link = mysqli_connect($this->_server, $this->_user, $this->_password, $this->_database);
         }
 		
 		$this->_link->set_charset("utf8");
 		$this->_link->query("set names 'UTF-8'");  
-		// $this->_link->character-set-server = utf8;
-		// $this->_link->collation-server = utf8_unicode_ci;
-		// mysqli_query('SET CHARACTER SET utf8', $this->_link);
 	}
 	
+	// функция записи в бд
 	public function query($query) {
 		$this->_result = false;
 		if ($this->_link) {
@@ -42,7 +36,7 @@ class DB {
 		return "no link";
 	}
 
-
+	// функция получения данных
 	public function getRows($query, $array = true) {
 		$this->_result = false;
 		if ($this->_link && $this->_result = mysqli_query( $this->_link,$query)) {
@@ -57,7 +51,8 @@ class DB {
 	}
 
 
-	
+	// функция формирования команды для записи
+	// имя таблицы, массив названия колонок, занчания
 	public function insert($table,$name, $values) {
 		$query = "INSERT INTO "."`".$table."`"." (";
 		foreach ((array) $name AS $key => $value)
@@ -71,42 +66,16 @@ class DB {
 		$query .= ")";
 		
 		return $this->query($query);
-		// return $query;
-		// return mysqli_query($this->_link,$query);
-	}
-
-
-	
-	public function update($table, $values, $where = false, $limit = false) {
-		if (!sizeof($values))
-			return true;
-		$query = 'UPDATE `'.$table.'` SET ';
-		foreach ($values AS $key => $value)
-			$query .= '`'.$key.'` = \''.$value.'\',';
-		$query = rtrim($query, ',');
-		if ($where)
-			$query .= ' WHERE '.$where;
-		if ($limit)
-			$query .= ' LIMIT '.intval($limit);
-		return $this->query($query);
 	}
 	
-	
-	
-	public function delete($table, $where = false, $limit = false) {
-		$this->_result = false;
-		if ($this->_link)
-			return mysql_query('DELETE FROM `'.pSQL($table).'`'.($where ? ' WHERE '.$where : '').($limit ? ' LIMIT '.intval($limit) : ''), $this->_link);
-		return false;
-	}
-	
-
+	// функция формирования команды для получения все значений таблицы
 	public function BuildSelect($table){
 		$query =  "SELECT * FROM ".$table;
 		return $this->query($query);
 		// return $query;
 	}
 
+	// считаем количество значений в таблице
 	public function	numRows() {
 		if ($this->_link AND $this->_result)
 			return mysqli_num_rows($this->_result);

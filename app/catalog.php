@@ -3,64 +3,24 @@
 <head>
 	<title>Scan cards</title>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <style>
-    #loading{position:fixed;top:40%;left:40%;z-index:1104;}
-    #myBtn {
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 30px;
-  z-index: 99;
-  font-size: 18px;
-  border: none;
-  outline: none;
-  background-color: red;
-  color: white;
-  cursor: pointer;
-  padding: 15px;
-  border-radius: 4px;
-}
-
-#myBtn:hover {
-  background-color: #555;
-}
-    </style>
 </head>
 <body>
-<script type="text/javascript">
-$( document ).ready(function() {
-    $("#loading").hide();
-});
-window.onscroll = function() {scrollFunction()};
-
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    document.getElementById("myBtn").style.display = "block";
-  } else {
-    document.getElementById("myBtn").style.display = "none";
-  }
-}
-
-// When the user clicks on the button, scroll to the top of the document
-function topFunction() {
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
-}
-</script>
-<!-- <img id="loading" alt="" src="../media/loader.gif"/> -->
-<button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>   
 
 
 <?php require "../includes/nava.php" ?>
 <?php
+// Сканировщик товаров каждого каталога
+
+// процесс идет долго, увеличиваем время загрузки страницы
 ini_set('max_execution_time', 600);
-// error_reporting(0);
 
 require_once 'classes/db.php';
 require_once 'classes/getter.php';
 
+// обьект бд
 $con = new DB();
 
+// получаем все каталоги из бд
 $res = $con->BuildSelect("categories");
 
 while($row = mysqli_fetch_array($res)){
@@ -72,103 +32,88 @@ while($row = mysqli_fetch_array($res)){
     echo "</tr>";
 echo "<br><br><br>";
 echo "</table>";
-    // $urls = "http://дизайн-керамика.рф". $row['url'];
-    // echo $urls;
+    
+    // формируем каждого каталога ссылку и получем код страницы 
     $object = new Getter();
     $object->url = "http://дизайн-керамика.рф". $row['url']."";
     $result = $object->get_web_page();
-//    print_r($result);
 
     if (($result['errno'] != 0 )||($result['http_code'] != 200)){
-        echo "No";
         echo $result['errmsg'];
 	}else{
 
     $page2 = $result['content'];
-    // echo htmlspecialchars($page2);
 
+    // режем до и после
     $pos = strpos($page2, "<!-- Catalog content -->");
     $page2 = substr($page2, $pos);
     $pos = strpos($page2, "<!-- /Catalog content -->");
     $page2 = substr($page2, 0, $pos);
 
-
-    echo $page2;
-    echo "<br><br><br>";
-
-
-
-    $name = array('name', 'url');
+    // регулярка для нарезки личной ссылки каждого товара
     $regex = "(?<=href=\").+(?=\")";
-    // <a href="/plitka/">Керамическая плитка</a>
-    // <a class="collection_cart" href="/plitka/collKarandashiKerama-Marazzi/">
 
+    // режем страницу каталога и получаем ссылки каждого товара
     if(preg_match_all("/$regex/iU", $page2, $matches)) {
         foreach ($matches[0] as $key => $value) {
             echo '<a href="http://дизайн-керамика.рф'.$value.'">'.$value.'</a>'."<br>";
-            // echo "http://дизайн-керамика.рф".$value."<br>";
 
-            
+        // создаем новый обьект для сохранения в бд данных каждого товара
         $getter = new Getter();
+        // формируем ссылку и получаем код страницы
         $getter->url = "http://дизайн-керамика.рф".$value."";
         $getter_result = $getter->get_web_page();
         if (($getter_result['errno'] != 0 )||($getter_result['http_code'] != 200)){
             echo $getter_result['errmsg'];
-            echo "oops..."."<hr>";
 	}
     else{
-        echo "good...";
-        // print_r($getter_result);
+
+        // обрабатываем страницу
         $page_product = $getter_result['content'];
-        // echo ($page_product);
+        // до после
         $page_aft = strpos($page_product, '<p class="the_title">');
         $page_product = substr($page_product, $page_aft);
         $page_aft = strpos($page_product, '<div class="product__info--other">');
         $page_product = substr($page_product, 0, $page_aft);
-        // htmlspecialchars($page_product);
-        // echo $page_product;
         
-        $reg_ex1 = "<(.|\n)*?>";
-        $reg_ex2 = "<div[^<>]*class=\"[^\"']+\"[^<>]*>[\s\S]*?</div>";
-        $reg_ex = "<div[^<>]*class=\"my-class\"[^<>]*>[\s\S]*?";
-
-
-        // $nodes = $xp->query('//div[@class="product__info__group"]');
-        // print_r($nodes);
-
-
+        // создаем структуру html страницы
         $dom = new DomDocument();
-// $dom->load($page_product);
-$dom->loadhtml('<?xml encoding="utf-8" ?>' . $page_product);
-$finder = new DomXPath($dom);
-$classname="product__info__group";
-$nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-// print_r($nodes);
-// echo $nodes->textContent;
-$insert_vals = array();
-$tables = array('coutry', 'creator', 'name', 'category');
-$counter = 0;
-foreach ($nodes as $value_card) {
-    if (preg_match('/(Код товара)/', $value_card->textContent)) {
-        echo "<li>No<br>";
-        continue;
-     }
-     $value_card->textContent = trim(preg_replace('/\s\s+/', ' ', $value_card->textContent));
+        $dom->loadhtml('<?xml encoding="utf-8" ?>' . $page_product);
+        // так как в разны товарах разная структура (иногда div иногда p) будем исплоьзавать DomXPath() и резать по классам
+        $finder = new DomXPath($dom);
+        // вот класс для нарезки
+        $classname="product__info__group";
+        $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+
+        // массивы которые будем обрабатывать для сохранения данных в бд
+        $insert_vals = array();
+        $tables = array('coutry', 'creator', 'name', 'category');
+        $counter = 0;
+        // пробегаем массив
+        foreach ($nodes as $value_card) {
+            // исключаем, кода есть код товара
+            if (preg_match('/(Код товара)/', $value_card->textContent)) {
+                continue;
+            }
+    // приводим в надлежащее состояное
+    $value_card->textContent = trim(preg_replace('/\s\s+/', ' ', $value_card->textContent));
     echo "<li>".$value_card->textContent."<br>";
         
-    // $insert_vals[$counter] = $$value_card->textContent;
-    // $counter = $counter + 1;
-    // array_push($insert_vals,$value_card->textContent);
+    // добавляем в массив
     array_splice($insert_vals, $counter, 0, $value_card->textContent);
    
 
-}
+}       
+        // обрабатываем код и получаем название товара
         preg_match_all('~the_title">\K(?:[^<]+)(?=<)~', $page_product, $matches10);
         foreach ($matches10[0] as $key => $value_name) {
             echo "<li>".$value_name."<br>";
+            // добаваляем в тот же массив
             array_push($insert_vals,$value_name);
         }
+        // добаваляем в тот же массив id каталога, чтобы обращаться к нему
         array_push($insert_vals, $row['id']);
+        // в некоторых товарах нет станы и произвадиетля, поэтому, если нет, то добавляем none
         echo $nubers = count($insert_vals)."<br>";
         if ($nubers == 2) {
             $insert_vals_sp = array();
@@ -177,22 +122,27 @@ foreach ($nodes as $value_card) {
             $insert_vals_sp[2] = $insert_vals[0];
             $insert_vals_sp[3] = $insert_vals[1];
             
-            
             print_r($insert_vals_sp);
+            // делаем запись в бд
             // $query =  $con->insert('card',$tables,$insert_vals_sp);
+
             echo "<hr>";
             continue;
         }
+        // если значений 4 то делаем запись
         print_r($insert_vals);
         echo "<br>";
+
+        // запись в бд
         // $query =  $con->insert('card',$tables,$insert_vals);
+
         echo "<hr>";
 
     }
 
 }
       }
-      echo "<br><br><br>";
+      echo "<br>";
 }
 }?>
 

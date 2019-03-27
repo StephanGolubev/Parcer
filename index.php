@@ -4,14 +4,10 @@
 	<title>Parcer</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-   <style>
-  body{
-    text-alieng:center;
-  } 
-   </style>
 </head>
+<!-- немного html -->
 <header>
-  <!-- Fixed navbar -->
+  Fixed navbar
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <a class="navbar-brand" href="">Parcer</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,10 +44,13 @@
 </header>
 <body>
  <?php 
+//  достаем все каталоги
  require_once 'app/classes/db.php';
+
  $con = new DB();
  $res = $con->BuildSelect("categories");
  while($row = mysqli_fetch_array($res)){
+  //  формируем card с ссылкой и id каталога
   echo '<div class="col-sm-6">
   <div class="card">
     <div class="card-body">
